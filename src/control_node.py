@@ -10,20 +10,21 @@ class ControlNode(Node):
     
     self.r = 0.04
     self.L = 0.07
-    self.max_velocity = 0.6
+    self.max_velocity = 0.5
   
-  def callback(self, msg):
-    # Received desired velocity command
-    # Convert linear and angular velocities to left and right wheel velocities
-    left_wheel_velocity = (msg.linear.x - msg.angular.z * self.L / 2.0) / self.r
-    right_wheel_velocity = (msg.linear.x + msg.angular.z * self.L / 2.0) / self.r
-    
+  def callback(self, msg):    
     # Ensure wheel velocities are within limits
-    left_wheel_velocity = max(-self.max_velocity, min(left_wheel_velocity, self.max_velocity))
-    right_wheel_velocity = max(-self.max_velocity, min(right_wheel_velocity, self.max_velocity))
+    twist_msg = Twist()
+    if msg.linear.x != 0:
+      forward_scaling_factor = 0.1 / abs(msg.linear.x)
+      twist_msg.linear.x = msg.linear.x * forward_scaling_factor
+    else:
+      twist_msg.linear.x = 0.0
+    if msg.angular.z != 0:
+      angular_scaling_factor = self.max_velocity / abs(msg.angular.z)
+      twist_msg.angular.z = msg.angular.z *angular_scaling_factor
+    else:
+      twist_msg.angular.z = 0.0
     
     # Publish wheel velocities as Twist messages
-    twist_msg = Twist()
-    twist_msg.linear.x = left_wheel_velocity
-    twist_msg.linear.y = right_wheel_velocity
-    self.publisher.publish(msg)
+    self.publisher.publish(twist_msg)

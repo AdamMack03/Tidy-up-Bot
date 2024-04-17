@@ -37,8 +37,8 @@ class ObjectDetectionNode(Node):
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
     # Define range of colours for object detection
-    lower_color = np.array([40, 50, 50])
-    higher_color = np.array([80, 255, 255])
+    lower_color = np.array([36, 0, 0])
+    higher_color = np.array([86, 255, 255])
     
     # Threshold the HSV image to get only the desired colours
     mask = cv2.inRange(hsv_image, lower_color, higher_color)
